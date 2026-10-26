@@ -1,0 +1,5 @@
+# Keep auxiliary files (.aux, .log, .out, .fls, …) in build/;
+# PDFs stay next to the .tex sources.
+$aux_dir = 'build';
+$pdf_mode = 1;
+$interaction = 'nonstopmode';

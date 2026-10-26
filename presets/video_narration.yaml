@@ -1,0 +1,25 @@
+# Preset: video_narration (Spoken Video Essay / Documentary VO)
+subject: "REPLACE_WITH_SUBJECT"
+format: video_narration
+angle: "REPLACE_WITH_SPECIFIC_THESIS_OR_ARC"
+working_title: "REPLACE_WITH_WORKING_TITLE"
+target_runtime_min: 15
+target_word_count: 2700
+tolerance_pct: 10
+audience: "general intelligent viewers; spoken-aloud cadence (~178 WPM)"
+tone: "conversational, direct, slightly dry, specific, spoken — never literary or promotional"
+# Citation modes: none | end_references | external_links
+citation_mode: none
+allow_headings: false
+allow_lists: false
+required_topics:
+  - "Cold open with a concrete date, place, and specific number"
+  - "Chronological spine after the cold open"
+  - "Closing coda that pays off the cold open with a verified fact"
+forbidden_topics:
+  - "invented dialogue or unverified private motives stated as fact"
+  - "receipt-theater in the VO (no 'the record shows', 'sources confirm')"
+  - "stacked metaphors or invented agency"
+  - "generic upbeat conclusions"
+source_restrictions:
+  - "Prefer primary documents, court/financial filings, and reputable journalism"

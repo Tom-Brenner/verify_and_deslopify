@@ -1,0 +1,8 @@
+{
+  "name": "verify-and-deslopify",
+  "description": "Research → sidecar receipts → draft → de-slop → verify → PDF for sourced, human-sounding writing.",
+  "version": "1.0.0",
+  "author": {
+    "name": "verify_and_deslopify contributors"
+  }
+}

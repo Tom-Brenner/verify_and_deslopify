@@ -1,0 +1,25 @@
+# Suggested GitHub repository topics (apply after creating the remote):
+#   gh repo edit --add-topic <topic> ...
+#
+# Overlap with blader/humanizer, plus verification / PDF tags.
+
+agent-skills
+ai-writing
+ai-humanizer
+anti-slop
+humanizer
+humanize-ai-text
+claude
+claude-code
+codex
+cursor
+chatgpt
+llm
+prompt-engineering
+writing-tools
+fact-checking
+research
+latex
+pdf
+markdown
+verification

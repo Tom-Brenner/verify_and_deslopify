@@ -1,0 +1,23 @@
+# Preset: case_study (Engineering / Product / Company Post-Mortem)
+subject: "REPLACE_WITH_SUBJECT"
+format: case_study
+angle: "What actually broke, what it cost, and what concrete changes fixed or failed to fix it"
+working_title: "REPLACE_WITH_WORKING_TITLE"
+target_word_count: 1400
+tolerance_pct: 12
+audience: "engineers, operators, and decision-makers"
+tone: "matter-of-fact, blameless but specific, zero marketing buzzwords"
+# Citation modes: none | end_references | external_links
+citation_mode: none
+allow_headings: true
+allow_lists: true
+required_topics:
+  - "Timeline of concrete events with dates/metrics"
+  - "Root cause or structural bottleneck backed by receipts.md"
+  - "Concrete aftermath metric or operational change"
+forbidden_topics:
+  - "significance inflation ('pivotal moment', 'testament to')"
+  - "inline-header bolded lists (- **Label:** explanation)"
+  - "upbeat horizon endings ('the future looks bright', 'step in the right direction')"
+source_restrictions:
+  - "Incident reports, commit/release logs, public filings, or primary interviews"

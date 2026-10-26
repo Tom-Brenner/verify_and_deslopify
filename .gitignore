@@ -1,0 +1,26 @@
+# Local episode runs (keep presets + scripts in git)
+runs/
+
+# LaTeX / makePdf
+build/
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.toc
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/

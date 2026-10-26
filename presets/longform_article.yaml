@@ -1,0 +1,24 @@
+# Preset: longform_article (Investigative Essay / Feature / Substack)
+subject: "REPLACE_WITH_SUBJECT"
+format: longform_article
+angle: "REPLACE_WITH_SPECIFIC_THESIS_OR_QUESTION"
+working_title: "REPLACE_WITH_WORKING_TITLE"
+target_word_count: 2000
+tolerance_pct: 10
+audience: "informed readers who want concrete reporting without AI padding"
+tone: "clear, analytical, direct, human — no corporate puffery or thesaurus cycling"
+# Citation modes: none | end_references | external_links
+citation_mode: none
+allow_headings: true
+allow_lists: false
+required_topics:
+  - "Concrete opening scene or anomalous metric"
+  - "Specific numbers, dates, and named actors backed by receipts.md"
+  - "Specific, non-cliché ending grounded in a verified fact"
+forbidden_topics:
+  - "inline-header bullet lists (- **Point:** ...)"
+  - "Title Case subheadings (use sentence case only)"
+  - "weasel attributions ('experts say', 'observers note')"
+  - "generic positive wrap-up"
+source_restrictions:
+  - "Primary sources, peer-reviewed papers, or named journalism"
