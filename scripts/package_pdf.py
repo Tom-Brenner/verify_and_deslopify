@@ -5,6 +5,12 @@ package_pdf.py — Convert draft_clean.md to draft.pdf using the makePdf layout.
 Requires: pandoc, latexmk, and a LaTeX engine (pdflatex or xelatex).
 Zero Python dependencies beyond the stdlib.
 
+Before pandoc, markdown is normalized so that:
+  - end_references markers [1] / [R01] become clickable links to #ref-N
+  - each References entry is its own paragraph with a clickable URL
+  - external_links markdown [text](url) stays as hyperref links
+  - hypersetup enables colorlinks (see templates/makePdf/header-includes.tex)
+
 Layout written into <run_dir> (makePdf contract):
   draft.tex, draft.pdf, Makefile, .latexmkrc, build/
 """
@@ -12,9 +18,11 @@ Layout written into <run_dir> (makePdf contract):
 from __future__ import annotations
 
 import argparse
+import re
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 LATEXMKRC = """\
@@ -50,6 +58,16 @@ distclean: clean
 \trm -rf build
 """
 
+REF_HEADING_RE = re.compile(r"(?im)^##\s+References\s*$")
+REF_LINE_RE = re.compile(r"^\[(\d+|R\d+)\]\s+(.+)$")
+URL_AT_END_RE = re.compile(r"(https?://\S+?)\s*$")
+# Citation markers like [1] or [R01], but not markdown links [text](url)
+CITE_MARKER_RE = re.compile(r"\[(\d+|R\d+)\](?!\()")
+
+
+def skill_root() -> Path:
+    return Path(__file__).resolve().parent.parent
+
 
 def ensure_tools() -> None:
     missing = [t for t in ("pandoc", "latexmk") if shutil.which(t) is None]
@@ -76,12 +94,99 @@ def find_markdown(run_dir: Path, draft: Path | None) -> Path:
     raise SystemExit(f"ERROR: no draft_clean.md found under {run_dir}")
 
 
+def _split_label_url(rest: str) -> tuple[str, str | None]:
+    """Split 'Label text. https://...' into (label, url)."""
+    m = URL_AT_END_RE.search(rest)
+    if not m:
+        return rest.strip(), None
+    url = m.group(1)
+    # Strip trailing sentence punctuation only; keep ')' that closes '(' in the path.
+    while url and url[-1] in ".,;\"'":
+        url = url[:-1]
+    if url.endswith(")") and url.count("(") < url.count(")"):
+        url = url[:-1]
+    label = rest[: m.start()].strip().rstrip(".")
+    return label, url
+
+
+def _format_ref_block(rid: str, label: str, url: str | None) -> str:
+    """One reference as its own markdown block with PDF-friendly anchors + links."""
+    lines = [
+        f"[]{{#ref-{rid}}}",
+        f"**[{rid}]** {label}" + ("." if label and not label.endswith((".", "!", "?")) else ""),
+    ]
+    if url:
+        # Explicit markdown link → pandoc \\href{} (handles () in Wikipedia paths)
+        lines.append("")
+        lines.append(f"[{url}]({url})")
+    return "\n".join(lines)
+
+
+def preprocess_markdown_for_pdf(md: str) -> str:
+    """
+    Normalize end_references and bare URL lines for LaTeX/PDF.
+
+    - Body [1] / [R01] → [[1]](#ref-1) (clickable jump to References)
+    - References entries each get their own paragraph, anchor, and <url> autolink
+    - Existing [text](url) markdown links are left alone
+    """
+    split = REF_HEADING_RE.split(md, maxsplit=1)
+    if len(split) == 1:
+        # No References section: still turn body markers into no-ops if present
+        return md
+
+    body, refs_raw = split[0], split[1]
+
+    entries: list[tuple[str, str, str | None]] = []
+    for raw_line in refs_raw.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        m = REF_LINE_RE.match(line)
+        if not m:
+            # Keep freeform lines as their own paragraphs
+            entries.append(("", line, None))
+            continue
+        rid, rest = m.group(1), m.group(2)
+        label, url = _split_label_url(rest)
+        entries.append((rid, label, url))
+
+    known_ids = {rid for rid, _, _ in entries if rid}
+
+    def cite_sub(match: re.Match[str]) -> str:
+        rid = match.group(1)
+        if known_ids and rid not in known_ids:
+            return match.group(0)
+        return f"[[{rid}]](#ref-{rid})"
+
+    body = CITE_MARKER_RE.sub(cite_sub, body)
+
+    ref_blocks: list[str] = []
+    for rid, label, url in entries:
+        if not rid:
+            ref_blocks.append(label)
+            continue
+        ref_blocks.append(_format_ref_block(rid, label, url))
+
+    refs_md = "## References\n\n" + "\n\n".join(ref_blocks) + "\n"
+    return body.rstrip() + "\n\n" + refs_md
+
+
+def header_includes_path() -> Path:
+    return skill_root() / "templates" / "makePdf" / "header-includes.tex"
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Package draft_clean.md as draft.pdf (makePdf layout).")
     parser.add_argument("run_dir", help="Run directory containing draft_clean.md")
     parser.add_argument("--draft", help="Override path to the markdown draft")
     parser.add_argument("--title", default=None, help="Optional PDF title metadata")
     parser.add_argument("--engine", default="pdflatex", choices=["pdflatex", "xelatex", "lualatex"])
+    parser.add_argument(
+        "--keep-preprocessed",
+        action="store_true",
+        help="Also write draft_clean.pdf.md (normalized markdown fed to pandoc)",
+    )
     args = parser.parse_args()
 
     ensure_tools()
@@ -93,32 +198,60 @@ def main() -> int:
     md_path = find_markdown(run_dir, Path(args.draft).expanduser().resolve() if args.draft else None)
     write_build_config(run_dir)
 
+    raw_md = md_path.read_text(encoding="utf-8")
+    pdf_md = preprocess_markdown_for_pdf(raw_md)
+    if args.keep_preprocessed:
+        (run_dir / "draft_clean.pdf.md").write_text(pdf_md, encoding="utf-8")
+
     tex_path = run_dir / "draft.tex"
     pdf_path = run_dir / "draft.pdf"
+    header = header_includes_path()
+    if not header.exists():
+        print(f"ERROR: missing pandoc header includes at {header}", file=sys.stderr)
+        return 2
 
-    pandoc_cmd = [
-        "pandoc",
-        str(md_path),
-        "-o",
-        str(tex_path),
-        "--standalone",
-        "-f",
-        "markdown",
-        "-t",
-        "latex",
-        f"--pdf-engine={args.engine}",
-    ]
-    if args.title:
-        pandoc_cmd.extend(["-V", f"title={args.title}"])
+    with tempfile.NamedTemporaryFile(
+        "w",
+        encoding="utf-8",
+        suffix=".md",
+        prefix="draft_clean_pdf_",
+        dir=run_dir,
+        delete=False,
+    ) as tmp:
+        tmp.write(pdf_md)
+        tmp_path = Path(tmp.name)
 
-    print(f"Converting {md_path.name} → draft.tex …")
-    subprocess.run(pandoc_cmd, check=True, cwd=run_dir)
+    try:
+        pandoc_cmd = [
+            "pandoc",
+            str(tmp_path),
+            "-o",
+            str(tex_path),
+            "--standalone",
+            "-f",
+            "markdown+autolink_bare_uris",
+            "-t",
+            "latex",
+            f"--pdf-engine={args.engine}",
+            f"--include-in-header={header}",
+            "-V",
+            "colorlinks=true",
+            "-V",
+            "linkcolor=blue",
+            "-V",
+            "urlcolor=blue",
+        ]
+        if args.title:
+            pandoc_cmd.extend(["-V", f"title={args.title}"])
 
-    # latexmk reads .latexmkrc (aux_dir=build).
-    print("Compiling draft.tex → draft.pdf (aux → build/) …")
-    subprocess.run(["latexmk", "-pdf", "draft.tex"], check=True, cwd=run_dir)
+        print(f"Converting {md_path.name} → draft.tex (citations + references normalized) …")
+        subprocess.run(pandoc_cmd, check=True, cwd=run_dir)
 
-    # Move stray aux files if latexmk ignored aux_dir for any reason
+        print("Compiling draft.tex → draft.pdf (aux → build/) …")
+        subprocess.run(["latexmk", "-pdf", "draft.tex"], check=True, cwd=run_dir)
+    finally:
+        tmp_path.unlink(missing_ok=True)
+
     for pattern in ("*.aux", "*.log", "*.out", "*.fls", "*.fdb_latexmk", "*.toc", "*.synctex.gz"):
         for stray in run_dir.glob(pattern):
             dest = run_dir / "build" / stray.name

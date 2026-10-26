@@ -1,0 +1,12 @@
+% Clickable internal + external links for verify_and_deslopify PDFs.
+% Loaded via pandoc --include-in-header (before hyperref is loaded), so
+% configure hyperref at begin-document after pandoc's \usepackage{hyperref}.
+\AtBeginDocument{%
+  \hypersetup{%
+    colorlinks=true,%
+    linkcolor=blue,%
+    urlcolor=blue,%
+    citecolor=blue,%
+    breaklinks=true%
+  }%
+}

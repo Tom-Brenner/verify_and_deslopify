@@ -26,7 +26,8 @@ A six-stage **Research → Verify → Draft → De-slop → Gate → PDF** harne
 ## Modes of Operation
 
 1. **Full Pipeline Mode (`research → verify → draft → strip → gate → pdf`):**
-   Given a topic or `brief.yaml`, create a run folder under `runs/<slug>/` (or a user-specified directory), research into `receipts.md`, outline in `plan.md`, write `draft.md`, strip into `draft_clean.md` + `strip_report.md`, run `scripts/verify_run.py`, then package `draft.pdf` via `scripts/package_pdf.py` (makePdf layout).
+   Given a topic or `brief.yaml`, create a run folder under `runs/test_<id>/` (or a user-specified directory), research into `receipts.md`, outline in `plan.md`, write `draft.md`, strip into `draft_clean.md` + `strip_report.md`, run `scripts/verify_run.py`, then package `draft.pdf` via `scripts/package_pdf.py` (makePdf layout).
+
 2. **Standalone Audit / De-slop Mode (`strip → gate` on existing files):**
    Given an existing draft file (and optional `receipts.md`), run Stage 4 and Stage 5 (`scripts/verify_run.py --draft <file> [--receipts <file>]`). Optionally run Stage 6 to emit a PDF.
 
@@ -52,7 +53,7 @@ A six-stage **Research → Verify → Draft → De-slop → Gate → PDF** harne
 
 Filenames use underscores (`draft_clean.md`), not dots inside the stem, so Windows tooling does not confuse multi-extension names.
 
-If `<run_dir>/draft_clean.md` or `draft.pdf` already exists, ask before overwriting or pick a new slug.
+If `<run_dir>/draft_clean.md` or `draft.pdf` already exists, ask before overwriting or pick a new `test_<id>`.
 
 ---
 
@@ -149,6 +150,12 @@ python3 <skill_dir>/scripts/package_pdf.py <run_dir>
 ```
 
 This writes `draft.tex`, compiles `draft.pdf`, drops `Makefile` + `.latexmkrc`, and keeps aux files under `build/`.
+
+PDF link behavior (see `references/citation_modes.md` and `templates/makePdf/header-includes.tex`):
+
+- `end_references`: in-text `[1]` markers become **clickable jumps** to the matching References entry; each reference is a **separate paragraph** with a **clickable URL**.
+- `external_links`: markdown `[text](url)` links stay **clickable** in the PDF.
+- Do not leave a run “done” if References still run together as one paragraph or if citation markers are inert text — re-run `package_pdf.py` after the packager upgrade.
 
 **Definition of done:** `draft.pdf` exists at `<run_dir>/draft.pdf`, `verification_report.md` shows PASS, and `draft_clean.md` is the markdown source of the PDF.
 
