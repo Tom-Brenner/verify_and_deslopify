@@ -1,6 +1,31 @@
-% Clickable internal + external links for verify_and_deslopify PDFs.
-% Loaded via pandoc --include-in-header (before hyperref is loaded), so
-% configure hyperref at begin-document after pandoc's \usepackage{hyperref}.
+% Default TeX/PDF layout for verify_and_deslopify (inspired by Elsevier cas-sc
+% single-column geometry). Loaded via pandoc --include-in-header.
+%
+% 1. Wide text block (narrow side margins)
+% 2. Single column (article default; do not enable twocolumn)
+% 3. A4 + fleqn come from pandoc -V classoption=… in package_pdf.py
+% 4. Slightly denser body
+% 5. Floats fill pages more aggressively
+% 6. Clickable hyperref links (configured after pandoc loads hyperref)
+
+\usepackage[
+  a4paper,
+  hmargin=14mm,
+  vmargin=20mm,
+  headheight=14pt,
+  headsep=10pt,
+  footskip=14pt
+]{geometry}
+
+\usepackage{setspace}
+\setstretch{1.05}
+
+\renewcommand{\floatpagefraction}{0.8}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.9}
+
+% hyperref is loaded later by pandoc's template; apply link style at begin-document.
 \AtBeginDocument{%
   \hypersetup{%
     colorlinks=true,%

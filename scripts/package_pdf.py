@@ -9,7 +9,7 @@ Before pandoc, markdown is normalized so that:
   - end_references markers [1] / [R01] become clickable links to #ref-N
   - each References entry is its own paragraph with a clickable URL
   - external_links markdown [text](url) stays as hyperref links
-  - hypersetup enables colorlinks (see templates/makePdf/header-includes.tex)
+  - header-includes.tex: cas-sc-like wide geometry, setspace, float fractions, hyperref
 
 Layout written into <run_dir> (makePdf contract):
   draft.tex, draft.pdf, Makefile, .latexmkrc, build/
@@ -234,6 +234,13 @@ def main() -> int:
             "latex",
             f"--pdf-engine={args.engine}",
             f"--include-in-header={header}",
+            # Single-column article; A4 + left-aligned equations (cas-sc sample options)
+            "-V",
+            "documentclass=article",
+            "-V",
+            "classoption=a4paper",
+            "-V",
+            "classoption=fleqn",
             "-V",
             "colorlinks=true",
             "-V",
@@ -247,8 +254,9 @@ def main() -> int:
         print(f"Converting {md_path.name} → draft.tex (citations + references normalized) …")
         subprocess.run(pandoc_cmd, check=True, cwd=run_dir)
 
+        # Always rebuild PDF from the fresh .tex (ignore stale draft.pdf).
         print("Compiling draft.tex → draft.pdf (aux → build/) …")
-        subprocess.run(["latexmk", "-pdf", "draft.tex"], check=True, cwd=run_dir)
+        subprocess.run(["latexmk", "-g", "-pdf", "draft.tex"], check=True, cwd=run_dir)
     finally:
         tmp_path.unlink(missing_ok=True)
 
