@@ -170,9 +170,7 @@ python3 scripts/package_pdf.py runs/test_<id>
 
 ## Credits
 
-- **Sidecar receipts & metaphor-strip (`M1–M3`):** from spoken narration / VO hygiene workflows.
 - **Anti-slop patterns (`H1, H5, H11, H15–H18, H23, H25`):** adapted from [blader/humanizer](https://github.com/blader/humanizer) (MIT), based on Wikipedia’s [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing).
-- **Optional PDF layout:** makePdf skill contract (`.tex` / `.pdf` at run root, aux in `build/`), only when TeX tools are installed.
 
 ## License
 
