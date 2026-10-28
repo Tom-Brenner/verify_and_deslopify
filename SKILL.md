@@ -101,18 +101,14 @@ Required keys:
 
 ### Stage 1 — Research & Sidecar Receipts (`receipts.md`)
 
-Use structured blocks:
+At run init, copy the placeholder so the model has a file **outside** the prose channel:
 
-```markdown
-### [R01] Short claim summary
-- **Status:** VERIFIED | DISPUTED | UNVERIFIED
-- **Source:** Outlet / Author (Date) — https://...
-- **Facts / Numbers:** 1989, $4.2 million, 55%
-- **Verbatim Quote:** "exact quote if used"
-- **Caveat:** conflicts / hedges
+```bash
+cp <skill_dir>/templates/receipts.md <run_dir>/receipts.md
 ```
 
-Never invent quotes, dates, or figures. Then:
+Fill structured blocks (see template). Status may be `VERIFIED` | `DISPUTED` | `UNVERIFIED` | `ALLEGATION`.  
+Never invent quotes, dates, or figures. Never announce “unverified” / “pleaded allegation” in `draft.md` — park Status/Caveat in `receipts.md` only. Then:
 
 ```bash
 python3 <skill_dir>/scripts/verify_run.py <run_dir> --stage receipts

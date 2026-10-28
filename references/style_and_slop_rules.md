@@ -65,22 +65,27 @@ Example: *"Comeback here does not mean the same sales. It means she can be booke
 | *"Comeback does not mean the same sales. It means she can be booked…"* | *"Delightful charts lower than SA. She gets major bookings again."* |
 | *"Not 870,000. Not SA. A comeback single…"* | *"Delightful peaks at number three — not SA numbers."* |
 | *"That is not normal Japan. That is Amigo Japan."* | Keep at most as one nickname joke, or cut to: *"A hundred fifty people show up for a teen pop civil case."* |
-| *"Those figures come from the fight and the coverage. They are not a public tax filing."* | Cut; or one line: *"Gossip floated huge Ayu-vs-Ami yen gaps. Unverified."* |
+| *"Those figures come from the fight and the coverage. They are not a public tax filing."* | **Cut** from prose. Park the dispute in `receipts.md`. |
 
 ### M5. Dispute / Source-Flex Theater in VO (`dispute_theater`) — SEVERE
-**The problem:** Performing the receipts ledger in spoken VO / article prose.
+**The problem:** Performing the receipts ledger — or the researcher’s confidence label — in spoken VO / article prose.
 **Ban in prose:**
 - Competing tallies in one breath (*"one tally puts it near 1.9 million. Japanese write-ups sometimes say 2.5."*)
 - *"write-ups float…"*, *"retelling that keeps circulating…"*, *"come from the fight and the coverage"*
 - *"That is their claim in the file."*, *"not a public tax filing."*, *"party lines and reporting lines"*
-- Soft-hedge writer notes (*"Soft-hedge both."*)
+- Soft-hedge writer notes (*"Soft-hedge both."*, *"treat that as…"*, *"pleaded allegation, not a settled public fact"*)
+- Epistemic footnotes said aloud (*"— unverified"*, *"Gossip floated… unverified"*, *"unverified."* as a tag)
 
-**Fix:** pick **one** sourced figure for prose, or cut the beat; put ranges/disputes only in `receipts.md`. Soft-hedge with one plain clause (*"Gossip put Ayu far above Ami that year — unverified."*) without naming the ledger.
+**Fix:** pick **one** hard, story-necessary fact for prose, or **cut the beat**. Ranges, confidence labels, and “allegation vs fact” meta belong only in `receipts.md` (see `templates/receipts.md`).  
+Allowed when the *speech act* is the story: *"Her side told the court the office took the drama offer without proper authorization."* — not *"treat that as their pleaded allegation…"*.  
+Do **not** soft-hedge by announcing uncertainty to the reader. If you cannot state it cleanly, delete it from prose.
 
 | Bad | Better |
 | :--- | :--- |
 | *"one Oricon-based tally… write-ups sometimes say two and a half"* | *"Oricon-linked tallies put SA near 1.9 million."* (range → receipts) |
-| *"Those figures come from the fight and the coverage. They are not a public tax filing."* | Cut; or one line: *"Gossip floated huge Ayu-vs-Ami yen gaps. Unverified."* |
+| *"Those figures come from the fight and the coverage. They are not a public tax filing."* | **Cut.** (yen-gap gossip → receipts only) |
+| *"Gossip floated huge Ayu-versus-Ami yen gaps that year — unverified."* | **Cut.** |
+| *"treat that as their pleaded allegation, not a settled public fact."* | *"Her side told the court the office took the drama offer without proper authorization."* |
 
 ---
 

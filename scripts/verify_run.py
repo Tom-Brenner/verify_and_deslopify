@@ -134,7 +134,7 @@ M4_CONTRASTIVE_PATTERNS = [
     r"(?:^|[.!?]\s+)Not [A-Z0-9].{0,40}\.\s+Not ",
 ]
 
-# M5: dispute / source-flex theater performed in prose
+# M5: dispute / source-flex theater performed in prose (incl. epistemic footnotes)
 M5_DISPUTE_THEATER_PATTERNS = [
     r"\bwrite-?ups?\b",
     r"\btally puts\b",
@@ -146,6 +146,12 @@ M5_DISPUTE_THEATER_PATTERNS = [
     r"\bsoft-?hedge\b",
     r"\bparty lines and reporting lines\b",
     r"\baudited tax return\b",
+    r"\bgossip floated\b",
+    r"\bunverified\b",
+    r"\bpleaded allegation\b",
+    r"\btreat (?:that|this|it) as\b",
+    r"\bnot a settled (?:public )?fact\b",
+    r"\ballegation,\s+not\b",
 ]
 
 # H1: Significance, Legacy & Trend Inflation (cf. blader/humanizer #1)
