@@ -128,7 +128,7 @@ Opening hook + closing payoff; section word budgets; mapped `[Rxx]` IDs; at most
 
 Rewrite into `draft_clean.md`. Log every non-trivial change in `strip_report.md`.
 
-Follow `references/style_and_slop_rules.md` (rules **M1–M5** and **H1, H5, H11, H15–H18, H23, H25**). Zero metaphors; no Not-X-But-Y; no dispute theater in prose.
+Follow `references/style_and_slop_rules.md` (rules **M1–M6** and **H1, H5, H11, H15–H18, H23, H25**). Zero metaphors; no Not-X-But-Y; no dispute theater; no JP→EN calques in prose.
 
 ### Stages 5–6 — Gate + PDF (hard refuse)
 

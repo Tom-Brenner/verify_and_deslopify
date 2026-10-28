@@ -2,14 +2,14 @@
 
 This reference defines the exact defect taxonomy for Stage 3 (Voice-First Draft), Stage 4 (Literalize & De-Slop), and Stage 5 (`scripts/verify_run.py`). Preferred ship path: `scripts/run_gate_and_package.py` (gate must PASS before `draft.pdf`).
 
-Rules **M1–M5** originate from the sidecar-sourced narrative workflow (`meltdown_vo` / `voice_first` / `voice_strip`).
+Rules **M1–M6** cover metaphor / agency / receipt-theater / contrastive cadence / dispute theater / JP→EN calques (shared with YT `vo_harness`).
 Rules **H1, H5, H11, H15–H18, H23, and H25** are adapted and extended from [`blader/humanizer`](https://github.com/blader/humanizer) (MIT License, grounded in WikiProject AI Cleanup's *Wikipedia:Signs of AI writing*).
 
-Keep shared M1–M5 wording in sync with `/home/tom/Dropbox/YT/vo_harness/references/style_and_slop_rules.md` (YT also has spoken-cadence rule C1).
+Keep shared M1–M6 wording in sync with `/home/tom/Dropbox/YT/vo_harness/references/style_and_slop_rules.md` (YT also has spoken-cadence rule C1).
 
 ---
 
-## 1. Metaphor, Agency & Epistemic Hygiene (`M1–M5`)
+## 1. Metaphor, Agency & Epistemic Hygiene (`M1–M6`)
 
 ### M1. Invented Agency & Non-Idiomatic Imagery (`invented_agency`) — SEVERE
 **The problem:** LLMs try to sound "literary" or punchy by making abstract nouns, corporate entities, financial instruments, or body parts perform physical actions that never happened. Mild figurative leftovers still fail when they invent agency or disguise a fact as a punchy image.
@@ -86,6 +86,28 @@ Do **not** soft-hedge by announcing uncertainty to the reader. If you cannot sta
 | *"Those figures come from the fight and the coverage. They are not a public tax filing."* | **Cut.** (yen-gap gossip → receipts only) |
 | *"Gossip floated huge Ayu-versus-Ami yen gaps that year — unverified."* | **Cut.** |
 | *"treat that as their pleaded allegation, not a settled public fact."* | *"Her side told the court the office took the drama offer without proper authorization."* |
+
+### M6. Japanese→English calques (`jp_en_calque`) — SEVERE
+**The problem:** When research is Japanese, the model glosses JP verbs/nouns into English that a native writer would never say — often a word-for-word map of 載る / 乗る / 干される / 流通 / 独立騒動, even when `receipts.md` already has a plain EN gloss.
+
+**Rules:**
+1. Draft EN from the **fact** (who / what / chart / yen), not from JP surface wording.
+2. If `receipts.md` has an **EN gloss**, prefer that wording over inventing a new gloss from the Japanese sentence.
+3. Never keep a line that only makes sense if you know the Japanese original.
+4. During de-slop: **delete or restate in idiomatic EN** — do not “soften” a calque into a sibling calque.
+
+**High-signal bans (non-exhaustive):**
+- 載る / 乗る on charts or lists → *"rides"* a chart, ranking, or distribution (*"the package rides book distribution"*)
+- 干される → *"dried"* / *"dried out"* for blacklist/no bookings
+- 独立騒動 → *"independence disturbance"* / *"independence uproar"* as narrator English
+- 活動休止 → *"activity rest"* / *"activity pause"* as a calqued noun stack (say *stopped working* / *no releases*)
+- 事務所が火を吹く-style → office “catching fire” legally (also M1)
+
+| Bad (JP calque) | Better (idiomatic EN) |
+| :--- | :--- |
+| *"Because the package rides book distribution, it never enters the Oricon singles chart."* | *"Sold as a book, so it never enters the Oricon singles chart."* |
+| *"she was dried by the industry"* | *"she could not get bookings"* / *"cut off from TV and major releases"* |
+| *"the independence disturbance begins"* | *"she and her parents sue the management office"* |
 
 ---
 

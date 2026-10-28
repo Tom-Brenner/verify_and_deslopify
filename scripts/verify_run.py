@@ -7,7 +7,7 @@ Checks:
   1. Stage artifacts & word-count contract (brief.yaml vs draft_clean.md / draft.md)
   2. Fact & quote grounding (numbers, years, currencies, percentages, and verbatim quotes
      in the draft must appear in receipts.md; zero orphan/mutated facts)
-  3. Metaphor, agency, receipt-theater, contrastive cadence, dispute theater (M1-M5)
+  3. Metaphor, agency, receipt-theater, contrastive cadence, dispute theater, JP→EN calques (M1-M6)
   4. Targeted anti-slop & formatting scanners adapted from blader/humanizer:
      - H1:  Significance, legacy & trend inflation
      - H5:  Vague attributions & weasel words
@@ -152,6 +152,21 @@ M5_DISPUTE_THEATER_PATTERNS = [
     r"\btreat (?:that|this|it) as\b",
     r"\bnot a settled (?:public )?fact\b",
     r"\ballegation,\s+not\b",
+]
+
+# M6: JP→EN calques (載る/乗る/干される/独立騒動/活動休止 glosses)
+# Note: do not ban bare "rides the charts" (idiomatic EN music slang).
+M6_JP_EN_CALQUE_PATTERNS = [
+    r"\brides\b.{0,40}\bdistribution\b",
+    r"\bpackage rides\b",
+    r"\brides (?:the )?(?:book|oricon|publishing)\b",
+    r"\brides (?:onto )?(?:the )?ranking\b",
+    r"\bclimbs onto (?:the )?(?:publishing |book )?ranking\b",
+    r"\bdried out\b",
+    r"\bwas dried\b",
+    r"\bdried by the (?:industry|office|agency)\b",
+    r"\bindependence (?:disturbance|uproar|scandal)\b",
+    r"\bactivity (?:rest|pause)\b",
 ]
 
 # H1: Significance, Legacy & Trend Inflation (cf. blader/humanizer #1)
@@ -424,6 +439,18 @@ def scan_m5_dispute_theater(text: str) -> list[Finding]:
         severity="SEVERE",
         category="epistemic",
         message="Rule M5: Dispute/source-flex theater in prose. Pick one sourced figure or move the range to receipts.md.",
+    )
+
+
+def scan_m6_jp_en_calque(text: str) -> list[Finding]:
+    """M6: JP→EN literal glosses that are not idiomatic English."""
+    return scan_regex_list(
+        text,
+        M6_JP_EN_CALQUE_PATTERNS,
+        rule_id="M6_JP_EN_CALQUE",
+        severity="SEVERE",
+        category="calque",
+        message="Rule M6: Japanese→English calque. Prefer receipt EN gloss / idiomatic who-what-when; do not map JP verbs literally.",
     )
 
 
@@ -774,6 +801,7 @@ def main() -> int:
     )
     findings.extend(scan_m4_contrastive_cadence(draft_text))
     findings.extend(scan_m5_dispute_theater(draft_text))
+    findings.extend(scan_m6_jp_en_calque(draft_text))
     citation_mode = str(brief.get("citation_mode", "none")).strip().lower()
     # Legacy boolean from earlier skill versions
     if brief.get("inline_citations") is True and citation_mode in {"", "none", "false"}:

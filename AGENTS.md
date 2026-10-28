@@ -33,4 +33,4 @@ See `references/citation_modes.md`.
 
 - Prefer `scripts/run_gate_and_package.py` for shipping. Never claim done if the wrapper exits non-zero.
 - Never call `scripts/package_pdf.py` alone for release; packager `--force` is debug-only.
-- Style/defect taxonomy includes **M4** (contrastive cadence) and **M5** (dispute theater); metaphors are zero-tolerance (M1–M2).
+- Style/defect taxonomy includes **M4** (contrastive cadence), **M5** (dispute theater), and **M6** (JP→EN calques); metaphors are zero-tolerance (M1–M2).
