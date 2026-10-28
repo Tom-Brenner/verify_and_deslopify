@@ -7,7 +7,7 @@ Checks:
   1. Stage artifacts & word-count contract (brief.yaml vs draft_clean.md / draft.md)
   2. Fact & quote grounding (numbers, years, currencies, percentages, and verbatim quotes
      in the draft must appear in receipts.md; zero orphan/mutated facts)
-  3. Metaphor, agency & receipt-theater scanners (M1-M3)
+  3. Metaphor, agency, receipt-theater, contrastive cadence, dispute theater (M1-M5)
   4. Targeted anti-slop & formatting scanners adapted from blader/humanizer:
      - H1:  Significance, legacy & trend inflation
      - H5:  Vague attributions & weasel words
@@ -89,7 +89,7 @@ def parse_simple_yaml(path: Path) -> dict:
 
 
 # ---------------------------------------------------------------------------
-# Rule Pattern Catalogs (M1-M3 + H1, H5, H15-H18, H23, H25 + Residue)
+# Rule Pattern Catalogs (M1-M5 + H1, H5, H15-H18, H23, H25 + Residue)
 # ---------------------------------------------------------------------------
 
 RECEIPT_THEATER_PATTERNS = [
@@ -113,6 +113,39 @@ INVENTED_AGENCY_PATTERNS = [
     r"\buseful inventory\b",
     r"\bbalance sheet deciding\b",
     r"\bhistory whispers\b",
+    r"\bmoney that hit\b",
+    r"\bbilling fight inside a freeze\b",
+    r"\bsomething dull and clever\b",
+    r"\bcatches fire\b",
+    r"\bpaperwork is still bleeding\b",
+    r"\blawsuit is contagious\b",
+    r"\bfairy godmother\b",
+    r"\ballowed on the map\b",
+    r"\bsame altitude\b",
+]
+
+# M4: Not-X-but-Y / contrastive oratory stacks
+M4_CONTRASTIVE_PATTERNS = [
+    r"\bdoes not mean\b.{0,80}\bit means\b",
+    r"\bdidn['\u2019]t mean\b.{0,80}\bit meant\b",
+    r"\bthat is not\b.{0,60}\bthat is\b",
+    r"\bthat['\u2019]s not\b.{0,60}\bthat['\u2019]s\b",
+    r"\bis not .{5,50} sense\.\s+\w+ is .{5,50} sense",
+    r"(?:^|[.!?]\s+)Not [A-Z0-9].{0,40}\.\s+Not ",
+]
+
+# M5: dispute / source-flex theater performed in prose
+M5_DISPUTE_THEATER_PATTERNS = [
+    r"\bwrite-?ups?\b",
+    r"\btally puts\b",
+    r"\bsometimes say\b",
+    r"\bcome from the (?:fight|coverage)\b",
+    r"\bnot a public tax filing\b",
+    r"\bclaim in the file\b",
+    r"\bretelling that keeps circulating\b",
+    r"\bsoft-?hedge\b",
+    r"\bparty lines and reporting lines\b",
+    r"\baudited tax return\b",
 ]
 
 # H1: Significance, Legacy & Trend Inflation (cf. blader/humanizer #1)
@@ -346,6 +379,48 @@ def scan_h11_synonym_cycling(text: str) -> list[Finding]:
     return findings
 
 
+def scan_m4_contrastive_cadence(text: str) -> list[Finding]:
+    """M4: Not-X-but-Y / contrastive oratory stacks."""
+    findings = scan_regex_list(
+        text,
+        M4_CONTRASTIVE_PATTERNS,
+        rule_id="M4_CONTRASTIVE_CADENCE",
+        severity="SEVERE",
+        category="cadence",
+        message="Rule M4: Contrastive cadence (Not X / That is not X / does not mean… it means). State the affirmative fact once.",
+    )
+    pair_re = re.compile(
+        r"\b(?:that is not|that['\u2019]s not)\b.{0,80}\b(?:that is|that['\u2019]s)\b",
+        re.IGNORECASE | re.DOTALL,
+    )
+    pairs = list(pair_re.finditer(text))
+    if len(pairs) > 1:
+        for m in pairs[1:]:
+            findings.append(
+                Finding(
+                    rule_id="M4_CONTRASTIVE_CADENCE",
+                    severity="SEVERE",
+                    category="cadence",
+                    span=re.sub(r"\s+", " ", m.group(0))[:80],
+                    line=line_number_for_offset(text, m.start()),
+                    message="Rule M4: Recurring 'That is not X. That is Y.' beat (at most one allowed). Prefer zero.",
+                )
+            )
+    return findings
+
+
+def scan_m5_dispute_theater(text: str) -> list[Finding]:
+    """M5: Competing tallies / source-flex / writer soft-hedge notes in prose."""
+    return scan_regex_list(
+        text,
+        M5_DISPUTE_THEATER_PATTERNS,
+        rule_id="M5_DISPUTE_THEATER",
+        severity="SEVERE",
+        category="epistemic",
+        message="Rule M5: Dispute/source-flex theater in prose. Pick one sourced figure or move the range to receipts.md.",
+    )
+
+
 def scan_h25_conclusions(text: str) -> list[Finding]:
     """Scan the final 25% of the document (and full text for extreme clichés) for H25 generic upbeat endings."""
     findings: list[Finding] = []
@@ -530,7 +605,7 @@ def build_markdown_report(
         lines.extend([
             "## Findings",
             "",
-            "Zero defects detected across fact grounding, receipt theater, metaphor/agency rules, and `blader/humanizer` checks (H1, H5, H11, H15–H18, H23, H25).",
+            "Zero defects detected across fact grounding, M1–M5 metaphor/cadence/dispute rules, and `blader/humanizer` checks (H1, H5, H11, H15–H18, H23, H25).",
             "",
         ])
     else:
@@ -680,7 +755,7 @@ def main() -> int:
         f_ground, fact_stats = verify_fact_grounding(draft_text, receipts_text)
         findings.extend(f_ground)
 
-    # 4. M1 & M3 Scanners (Invented Agency & Receipt Theater)
+    # 4. M1–M5 scanners (agency, contrastive cadence, dispute theater, receipt theater)
     findings.extend(
         scan_regex_list(
             draft_text,
@@ -688,9 +763,11 @@ def main() -> int:
             rule_id="M1_INVENTED_AGENCY",
             severity="SEVERE",
             category="metaphor",
-            message="Rule M1: Invented agency or banned figurative cliché. Literalize who did what.",
+            message="Rule M1: Invented agency or banned figurative cliché. Literalize who did what; remove metaphors.",
         )
     )
+    findings.extend(scan_m4_contrastive_cadence(draft_text))
+    findings.extend(scan_m5_dispute_theater(draft_text))
     citation_mode = str(brief.get("citation_mode", "none")).strip().lower()
     # Legacy boolean from earlier skill versions
     if brief.get("inline_citations") is True and citation_mode in {"", "none", "false"}:

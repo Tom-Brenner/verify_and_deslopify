@@ -26,7 +26,7 @@ A six-stage **Research → Verify → Draft → De-slop → Gate → PDF** harne
 ## Modes of Operation
 
 1. **Full Pipeline Mode (`research → verify → draft → strip → gate → pdf`):**
-   Given a topic or `brief.yaml`, create a run folder under `runs/test_<id>/` (or a user-specified directory), research into `receipts.md`, outline in `plan.md`, write `draft.md`, strip into `draft_clean.md` + `strip_report.md`, run `scripts/verify_run.py`, then package `draft.pdf` via `scripts/package_pdf.py` (makePdf layout).
+   Given a topic or `brief.yaml`, create a run folder under `runs/test_<id>/` (or a user-specified directory), research into `receipts.md`, outline in `plan.md`, write `draft.md`, strip into `draft_clean.md` + `strip_report.md`, then ship via `scripts/run_gate_and_package.py` (verify must PASS before `draft.pdf`).
 
 2. **Standalone Audit / De-slop Mode (`strip → gate` on existing files):**
    Given an existing draft file (and optional `receipts.md`), run Stage 4 and Stage 5 (`scripts/verify_run.py --draft <file> [--receipts <file>]`). Optionally run Stage 6 to emit a PDF.
@@ -84,8 +84,7 @@ verify_and_deslopify checklist:
 - [ ] Stage 2: Outline -> plan.md
 - [ ] Stage 3: Voice-first draft -> draft.md
 - [ ] Stage 4: Literalize & de-slop -> draft_clean.md + strip_report.md
-- [ ] Stage 5: Gate -> `python3 scripts/verify_run.py <run_dir> --stage final` (must exit 0)
-- [ ] Stage 6: PDF -> `python3 scripts/package_pdf.py <run_dir>` → draft.pdf
+- [ ] Stages 5–6: Gate+PDF -> `python3 scripts/run_gate_and_package.py <run_dir>` (must exit 0; hard refuse on FAIL)
 ```
 
 ### Stage 0 — Brief (`brief.yaml`)
@@ -133,23 +132,17 @@ Opening hook + closing payoff; section word budgets; mapped `[Rxx]` IDs; at most
 
 Rewrite into `draft_clean.md`. Log every non-trivial change in `strip_report.md`.
 
-Follow `references/style_and_slop_rules.md` (rules **M1–M3** and **H1, H5, H11, H15–H18, H23, H25**).
+Follow `references/style_and_slop_rules.md` (rules **M1–M5** and **H1, H5, H11, H15–H18, H23, H25**). Zero metaphors; no Not-X-But-Y; no dispute theater in prose.
 
-### Stage 5 — Deterministic Verification Gate
-
-```bash
-python3 <skill_dir>/scripts/verify_run.py <run_dir> --stage final
-```
-
-Must exit `0`. Fix SEVERE findings and re-run. Never call the run done while the gate fails.
-
-### Stage 6 — PDF packaging (makePdf layout) — final deliverable
+### Stages 5–6 — Gate + PDF (hard refuse)
 
 ```bash
-python3 <skill_dir>/scripts/package_pdf.py <run_dir>
+python3 <skill_dir>/scripts/run_gate_and_package.py <run_dir>
 ```
 
-This writes `draft.tex`, compiles `draft.pdf`, drops `Makefile` + `.latexmkrc`, and keeps aux files under `build/`.
+Must exit `0`. On FAIL the wrapper prints `GATE FAILED — refusing PDF / deliverable packaging`, exits non-zero, and does **not** produce/refresh `draft.pdf`. Fix SEVERE findings and re-run. Never call `package_pdf.py` alone for release; `--force` is debug-only.
+
+On PASS the wrapper calls `package_pdf.py`, which writes `draft.tex`, compiles `draft.pdf`, drops `Makefile` + `.latexmkrc`, and keeps aux files under `build/`.
 
 PDF link behavior (see `references/citation_modes.md` and `templates/makePdf/header-includes.tex`):
 
@@ -169,4 +162,5 @@ Requires host tools: `pandoc`, `latexmk`, and `pdflatex` (or `xelatex`).
 - Using dotted stems like `draft.clean.md` (legacy only; prefer `draft_clean.md`)
 - Mixing `end_references` markers with raw URL dumps (`external_links`) in the same piece unless the user asked for both
 - Skipping `voice`/strip rules because citations were enabled
-- Claiming PASS while `verify_run.py` exits non-zero
+- Claiming PASS / done while `run_gate_and_package.py` (or `verify_run.py`) exits non-zero
+- Calling `package_pdf.py` alone for release, or using `--force` to mark a run done

@@ -1,20 +1,24 @@
 # Style, Metaphor & Anti-Slop Reference (`verify_and_deslopify`)
 
-This reference defines the exact defect taxonomy for Stage 3 (Voice-First Draft), Stage 4 (Literalize & De-Slop), and Stage 5 (`scripts/verify_run.py`).
+This reference defines the exact defect taxonomy for Stage 3 (Voice-First Draft), Stage 4 (Literalize & De-Slop), and Stage 5 (`scripts/verify_run.py`). Preferred ship path: `scripts/run_gate_and_package.py` (gate must PASS before `draft.pdf`).
 
-Rules **M1–M3** originate from the sidecar-sourced narrative workflow (`meltdown_vo` / `voice_first` / `voice_strip`).
+Rules **M1–M5** originate from the sidecar-sourced narrative workflow (`meltdown_vo` / `voice_first` / `voice_strip`).
 Rules **H1, H5, H11, H15–H18, H23, and H25** are adapted and extended from [`blader/humanizer`](https://github.com/blader/humanizer) (MIT License, grounded in WikiProject AI Cleanup's *Wikipedia:Signs of AI writing*).
+
+Keep shared M1–M5 wording in sync with `/home/tom/Dropbox/YT/vo_harness/references/style_and_slop_rules.md` (YT also has spoken-cadence rule C1).
 
 ---
 
-## 1. Metaphor, Agency & Epistemic Hygiene (`M1–M3`)
+## 1. Metaphor, Agency & Epistemic Hygiene (`M1–M5`)
 
 ### M1. Invented Agency & Non-Idiomatic Imagery (`invented_agency`) — SEVERE
-**The problem:** LLMs try to sound "literary" or punchy by making abstract nouns, corporate entities, financial instruments, or body parts perform physical actions that never happened.
+**The problem:** LLMs try to sound "literary" or punchy by making abstract nouns, corporate entities, financial instruments, or body parts perform physical actions that never happened. Mild figurative leftovers still fail when they invent agency or disguise a fact as a punchy image.
 **Ban list:**
 - Words or quotes positioned physically (*"the word Reuters put near his mouth"*)
 - Empires, catalogs, brands, or balance sheets walking, bleeding, breathing, keeping keys, or deciding someone is *"useful inventory"*
 - Weather/atmosphere/oxygen metaphors for popularity or money (*"writes the weather"*, *"losing the chart feels like losing oxygen"*, *"sharing oxygen"*)
+- Soft figurative money / freeze lines: *"the money that hit the company before anyone trimmed it"*, *"a billing fight inside a freeze"*
+- Clever-but-figurative action labels: *"she does something dull and clever"* (state the literal action)
 - Cold opens that rely on figurative scene-setting instead of a concrete date, place, person, and action.
 
 | Bad (Invented Agency / Metaphor) | Good (Literalized Fact + Tone) |
@@ -23,13 +27,16 @@ Rules **H1, H5, H11, H15–H18, H23, and H25** are adapted and extended from [`b
 | *"Kyodo and Reuters both put the word near his mouth."* | *"Kyodo and Reuters both quoted him saying it."* |
 | *"A balance sheet deciding a human being was still useful inventory."* | *"The label still needed his catalog to pay off its debt."* |
 | *"Until the song feels like weather."* | *"Until you could not walk through a mall in 1984 without hearing it."* |
+| *"the money that hit the company before anyone trimmed it"* | *"original fee statements from labels and ad agencies"* / *"gross fees before the office took its cut"* |
+| *"a billing fight inside a freeze"* | *"a royalty and consent lawsuit while she had no TV bookings"* |
+| *"she does something dull and clever"* | *"she releases a photobook with a single attached, sold as a book"* |
 
-### M2. Stacked Metaphors & Clever Replacements (`stacked_metaphor`) — MEDIUM / SEVERE
-**The problem:** When asked to edit, LLMs often swap one strained metaphor for another ("thrift-store armor" → "neon battle gear").
+### M2. Metaphors — remove them all (`stacked_metaphor` / any figurative) — SEVERE
+**The problem:** When asked to edit, LLMs often swap one strained metaphor for another ("thrift-store armor" → "neon battle gear"), or leave "mild" figurative lines that still sound like LLM vividness.
 **Rules:**
-1. Prefer **zero** metaphors.
-2. Never put two figurative images in the same paragraph.
-3. During the de-slop pass, **never replace a bad metaphor with a cleverer one**—delete the image and keep the literal who/what/when/number.
+1. **Zero metaphors** in VO / draft prose. Delete the image; keep the literal who/what/when/number.
+2. Never put two figurative images in the same paragraph (and do not keep one "clever" figurative line as a compromise).
+3. During the de-slop pass, **never replace a bad metaphor with a cleverer one**—and never replace a contrastive cadence line with a sibling contrast (see M4).
 
 ### M3. Receipt Theater in Prose (`receipt_theater`) — SEVERE
 **The problem:** When an agent researches facts before writing, it gets anxious to prove to the reader that it did the homework. It litters the prose with compliance language.
@@ -40,6 +47,40 @@ Rules **H1, H5, H11, H15–H18, H23, and H25** are adapted and extended from [`b
 - Naming 3–4 outlets in a sentence just to prove notability (*"covered by the NYT, BBC, and Reuters"*) when the outlet is not an actor in the story.
 
 **The Sidecar Rule:** Put the URL, date, and verbatim quote in `receipts.md`. In the prose, state the verified fact directly. Name an outlet in prose **only** when the publication or broadcast itself triggered the next event (e.g., *"After Weekly Bunshun published the hotel photos on Wednesday, the sponsor pulled its ads by Friday"*).
+
+### M4. Contrastive Cadence (`contrastive_cadence`) — SEVERE
+**The problem:** LLM oratory habit: define by negation stacks instead of one plain claim.
+**Ban / limit:**
+- `Not X. Not Y. Z.`
+- `She/He/It is not X. She/He/It is Y.`
+- `X does not mean A. It means B.`
+- `That is not X. That is Y.` used as a recurring beat (allow **at most one** intentional punchline in cold open or coda if situational; prefer zero)
+
+**Fix:** one sentence with the affirmative fact.  
+Example: *"Comeback here does not mean the same sales. It means she can be booked…"* → *"Delightful charts; sales are far below SA. She can be booked on the major circuit again."*
+
+| Bad | Better |
+| :--- | :--- |
+| *"She is not retired in the legal sense. She is unemployed in the industry sense."* | *"Commercial deals end. New bookings do not replace them. Activity stops."* |
+| *"Comeback does not mean the same sales. It means she can be booked…"* | *"Delightful charts lower than SA. She gets major bookings again."* |
+| *"Not 870,000. Not SA. A comeback single…"* | *"Delightful peaks at number three — not SA numbers."* |
+| *"That is not normal Japan. That is Amigo Japan."* | Keep at most as one nickname joke, or cut to: *"A hundred fifty people show up for a teen pop civil case."* |
+| *"Those figures come from the fight and the coverage. They are not a public tax filing."* | Cut; or one line: *"Gossip floated huge Ayu-vs-Ami yen gaps. Unverified."* |
+
+### M5. Dispute / Source-Flex Theater in VO (`dispute_theater`) — SEVERE
+**The problem:** Performing the receipts ledger in spoken VO / article prose.
+**Ban in prose:**
+- Competing tallies in one breath (*"one tally puts it near 1.9 million. Japanese write-ups sometimes say 2.5."*)
+- *"write-ups float…"*, *"retelling that keeps circulating…"*, *"come from the fight and the coverage"*
+- *"That is their claim in the file."*, *"not a public tax filing."*, *"party lines and reporting lines"*
+- Soft-hedge writer notes (*"Soft-hedge both."*)
+
+**Fix:** pick **one** sourced figure for prose, or cut the beat; put ranges/disputes only in `receipts.md`. Soft-hedge with one plain clause (*"Gossip put Ayu far above Ami that year — unverified."*) without naming the ledger.
+
+| Bad | Better |
+| :--- | :--- |
+| *"one Oricon-based tally… write-ups sometimes say two and a half"* | *"Oricon-linked tallies put SA near 1.9 million."* (range → receipts) |
+| *"Those figures come from the fight and the coverage. They are not a public tax filing."* | Cut; or one line: *"Gossip floated huge Ayu-vs-Ami yen gaps. Unverified."* |
 
 ---
 

@@ -28,3 +28,9 @@ See `references/citation_modes.md`.
 - Style/defect taxonomy: `references/style_and_slop_rules.md`
 - Deterministic scanners must stay in sync in `scripts/verify_run.py`
 - Credit `blader/humanizer` when adapting wording from its patterns
+
+## Hard refuse / done criteria
+
+- Prefer `scripts/run_gate_and_package.py` for shipping. Never claim done if the wrapper exits non-zero.
+- Never call `scripts/package_pdf.py` alone for release; packager `--force` is debug-only.
+- Style/defect taxonomy includes **M4** (contrastive cadence) and **M5** (dispute theater); metaphors are zero-tolerance (M1–M2).

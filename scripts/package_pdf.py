@@ -25,6 +25,33 @@ import sys
 import tempfile
 from pathlib import Path
 
+
+def require_gate_pass(run_dir: Path, *, force: bool) -> None:
+    """Refuse packaging unless verification_report.md shows overall PASS."""
+    if force:
+        print("WARNING: --force set; skipping gate PASS check (debug only).", file=sys.stderr)
+        return
+    report = run_dir / "verification_report.md"
+    if not report.exists():
+        raise SystemExit(
+            f"ERROR: missing {report.name}. Run verify_run.py (or run_gate_and_package.py) first. "
+            "Use --force only for debugging."
+        )
+    text = report.read_text(encoding="utf-8")
+    if re.search(r"Overall Gate Status:\s*\*\*PASS\*\*", text) or re.search(
+        r"# Verification & De-Slop Report \(`PASS`\)", text
+    ):
+        return
+    if re.search(r"\bFAIL\b", text) or "Overall Gate Status:** **FAIL**" in text:
+        raise SystemExit(
+            f"ERROR: gate did not PASS ({report}). Refusing PDF packaging. "
+            "Fix SEVERE findings and re-run verify_run.py, or use run_gate_and_package.py."
+        )
+    raise SystemExit(
+        f"ERROR: could not confirm PASS in {report}. Refusing PDF packaging."
+    )
+
+
 LATEXMKRC = """\
 # Keep auxiliary files (.aux, .log, .out, .fls, …) in build/;
 # PDFs stay next to the .tex sources.
@@ -187,6 +214,17 @@ def main() -> int:
         action="store_true",
         help="Also write draft_clean.pdf.md (normalized markdown fed to pandoc)",
     )
+    parser.add_argument(
+        "--require-pass",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Require verification_report.md overall PASS before packaging (default: True)",
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="DEBUG ONLY: skip gate PASS check. Skills forbid this for release/done.",
+    )
     args = parser.parse_args()
 
     ensure_tools()
@@ -194,6 +232,9 @@ def main() -> int:
     if not run_dir.is_dir():
         print(f"ERROR: not a directory: {run_dir}", file=sys.stderr)
         return 2
+
+    # Default: require PASS. --force skips (debug only).
+    require_gate_pass(run_dir, force=bool(args.force) or not args.require_pass)
 
     md_path = find_markdown(run_dir, Path(args.draft).expanduser().resolve() if args.draft else None)
     write_build_config(run_dir)
